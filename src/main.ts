@@ -24,12 +24,20 @@ async function run() {
     }
 
     await exec.exec('git', ['checkout', '-b', branchName]);
-    await exec.exec('yarn install');
-    if (json.scripts && json.scripts.build) {
-      await exec.exec('yarn build');
+
+    const hasYarnLock = await fs.exists('yarn.lock');
+    const packageManager = hasYarnLock ? 'yarn' : 'npm';
+
+    const hasBuildScript = json.scripts && json.scripts.build;
+    if (hasBuildScript) {
+      await exec.exec(`${packageManager} install`);
+      await exec.exec(`${packageManager} run build`);
+      await exec.exec('rm -rf node_modules');
+      await exec.exec(`${packageManager} install --production`);
+    } else {
+      await exec.exec(`${packageManager} install --production`);
     }
-    await exec.exec('rm -rf node_modules');
-    await exec.exec('yarn install --production');
+
     await exec.exec('git config --global user.email "github-actions[bot]@users.noreply.github.com"');
     await exec.exec('git config --global user.name "github-actions[bot]"');
     await exec.exec('git remote set-url origin https://x-access-token:'+githubToken+'@github.com/'+context.repo.owner+'/'+context.repo.repo+'.git');
