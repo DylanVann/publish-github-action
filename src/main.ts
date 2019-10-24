@@ -24,11 +24,19 @@ async function run() {
     }
 
     await exec.exec('git', ['checkout', '-b', branchName]);
-    await exec.exec('npm install --production');
+    await exec.exec('yarn install');
+    if (json.scripts && json.scripts.build) {
+      await exec.exec('yarn build');
+    }
+    await exec.exec('rm -rf node_modules');
+    await exec.exec('yarn install --production');
     await exec.exec('git config --global user.email "github-actions[bot]@users.noreply.github.com"');
     await exec.exec('git config --global user.name "github-actions[bot]"');
     await exec.exec('git remote set-url origin https://x-access-token:'+githubToken+'@github.com/'+context.repo.owner+'/'+context.repo.repo+'.git');
     await exec.exec('git add -f node_modules');
+    if (json.files) {
+      await exec.exec(`git add -f ${json.files.join(' ')}`);
+    }
     await exec.exec('git commit -a -m "prod dependencies"');
     await exec.exec('git', ['push', 'origin', branchName]);
 
