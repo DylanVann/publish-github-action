@@ -1,8 +1,8 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
+import * as fs from 'fs'
 const Github = require('@actions/github');
 const Octokit = require('@octokit/rest').plugin(require('@octokit/plugin-retry'));
-const fs = require('fs');
 const semver = require('semver');
 const githubToken = core.getInput('github_token', { required: true });
 const context = Github.context;
@@ -25,7 +25,7 @@ async function run() {
 
     await exec.exec('git', ['checkout', '-b', branchName]);
 
-    const hasYarnLock = await fs.exists('yarn.lock');
+    const hasYarnLock = fs.existsSync('yarn.lock');
     const packageManager = hasYarnLock ? 'yarn' : 'npm';
 
     const hasBuildScript = json.scripts && json.scripts.build;
@@ -33,11 +33,9 @@ async function run() {
       await exec.exec(`${packageManager} install`);
       await exec.exec(`${packageManager} run build`);
       await exec.exec('rm -rf node_modules');
-      await exec.exec(`${packageManager} install --production`);
-    } else {
-      await exec.exec(`${packageManager} install --production`);
     }
 
+    await exec.exec(`${packageManager} install --production`);
     await exec.exec('git config --global user.email "github-actions[bot]@users.noreply.github.com"');
     await exec.exec('git config --global user.name "github-actions[bot]"');
     await exec.exec('git remote set-url origin https://x-access-token:'+githubToken+'@github.com/'+context.repo.owner+'/'+context.repo.repo+'.git');
