@@ -1,6 +1,6 @@
 # Publish GitHub Action
 
-![](https://img.shields.io/github/v/release/dylanvann/publish-github-action?style=flat-square)
+![Version](https://img.shields.io/github/v/release/dylanvann/publish-github-action?style=flat-square)
 
 This action creates a release branch for your GitHub Actions which will be automatically tagged and released.
 The release version can be  defined in `package.json`.
