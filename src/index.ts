@@ -7,9 +7,9 @@ import * as tar from 'tar'
 
 const Github = require('@actions/github')
 const OctokitPluginRetry = require('@octokit/plugin-retry')
-const Octokit = require('@octokit/rest')
+const createOctokit = require('@octokit/rest')
 
-Octokit.plugin(OctokitPluginRetry)
+const Octokit = createOctokit.plugin(OctokitPluginRetry)
 
 const githubToken = core.getInput('github_token', { required: true })
 const context = Github.context
