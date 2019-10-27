@@ -3,7 +3,7 @@
   "version": "1.1.17",
   "description": "Publish your GitHub Action.",
   "license": "MIT",
-  "author": "Dylan Vann",
+  "author": "Dylan Vann <dylan@dylanvann.com> (https://dylanvann.com)",
   "files": [
     "action.yml",
     "dist"
