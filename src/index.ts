@@ -61,6 +61,13 @@ async function run() {
     await exec.exec(`git checkout --orphan empty-branch`)
     // Remove all files and folders.
     await exec.exec(`git rm -rf .`)
+    // Also remove ignored files.
+    const filesToDelete = await fs.readdir(process.cwd())
+    // Not .git though.
+    const filesToDeleteFiltered = filesToDelete.filter(p => p !== '.git')
+    await Promise.all(
+      filesToDeleteFiltered.map(p => fs.remove(path.join(process.cwd(), p))),
+    )
     // Move back the package.
     await fs.move(tempPackedFilePath, packagedFilePath)
     // Extract it.
