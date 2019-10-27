@@ -1,6 +1,6 @@
 {
   "name": "publish-github-action",
-  "version": "1.1.23",
+  "version": "1.1.24",
   "description": "Publish your GitHub Action.",
   "license": "MIT",
   "author": "Dylan Vann <dylan@dylanvann.com> (https://dylanvann.com)",
@@ -12,8 +12,8 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "build": "yarn run build:ncc && yarn run build:fix",
-    "build:ncc": "ncc build src/index.ts",
     "build:fix": "ts-node scripts/build.ts",
+    "build:ncc": "ncc build src/index.ts",
     "lint": "tsdx lint",
     "start": "ncc build src/index.ts --watch",
     "test": "tsdx test"

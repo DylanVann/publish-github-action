@@ -53,7 +53,7 @@ async function run() {
     await exec.exec(`yarn pack`)
 
     // We create a branch containing only the contents of the package.
-    const packagedFilePath = path.join(__dirname, `${name}-${version}.tgz`)
+    const packagedFilePath = path.join(process.cwd(), `${name}-${version}.tgz`)
     // Move it to a directory above this so that we can delete everything here.
     const tempPackedFilePath = path.join(packagedFilePath, '..')
     await fs.move(packagedFilePath, tempPackedFilePath)
