@@ -65,6 +65,7 @@ async function run() {
     await fs.move(tempPackedFilePath, packagedFilePath)
     // Extract it.
     core.info(`Extracting ${packagedFilename}`)
+    await exec.exec('ls')
     await tar.extract({ file: packagedFilePath })
     await fs.remove(packagedFilePath)
     // Move from "package" into cwd.
