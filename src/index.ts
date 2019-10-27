@@ -4,8 +4,9 @@ import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as semver from 'semver'
 import * as tar from 'tar'
-import Github from '@actions/github'
-import Octokit from '@octokit/rest'
+
+const Github = require('@actions/github')
+const Octokit = require('@octokit/rest')
 
 const githubToken = core.getInput('github_token', { required: true })
 const context = Github.context
