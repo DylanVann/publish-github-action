@@ -1,0 +1,13 @@
+name: 'Publish GitHub Action'
+description: 'Publish your GitHub Action.'
+author: 'Dylan Vann <dylan@dylanvann.com> (https://dylanvann.com)'
+branding:
+  icon: 'truck'
+  color: 'blue'
+inputs:
+  github_token:
+    description: 'Token for the github API'
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
