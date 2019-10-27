@@ -34,7 +34,6 @@ async function run() {
     }
 
     await exec.exec(`git checkout -b ${branchName}`)
-
     await exec.exec(
       'git config --global user.email "github-actions[bot]@users.noreply.github.com"',
     )
@@ -48,7 +47,6 @@ async function run() {
         context.repo.repo +
         '.git',
     )
-    await exec.exec(`git checkout -b ${branchName}`)
 
     await exec.exec(`yarn install`)
     await exec.exec(`yarn run build`)
