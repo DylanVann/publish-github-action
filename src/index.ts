@@ -58,7 +58,6 @@ async function run() {
     const packagedFilePath = path.join(process.cwd(), packagedFilename)
     const tempPackedFilePath = path.join(os.tmpdir(), packagedFilename)
     await fs.move(packagedFilePath, tempPackedFilePath)
-    await exec.exec(`git checkout --orphan empty-branch`)
     // Remove all files and folders.
     await exec.exec(`git rm -rf .`)
     await exec.exec(`git clean -fdx`)
@@ -80,7 +79,7 @@ async function run() {
 
     await exec.exec(`git add .`)
     await exec.exec(`git commit -a -m "release ${version}"`)
-    await exec.exec('git', ['push', 'origin', branchName])
+    await exec.exec(`git push origin ${branchName}`)
 
     await exec.exec('git', ['push', 'origin', ':refs/tags/' + version])
     await exec.exec('git', ['tag', '-fa', version, '-m', version])
