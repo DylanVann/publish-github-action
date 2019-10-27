@@ -48,6 +48,7 @@ async function run() {
         context.repo.repo +
         '.git',
     )
+    await exec.exec(`git checkout -b ${branchName}`)
 
     await exec.exec(`yarn install`)
     await exec.exec(`yarn run build`)
