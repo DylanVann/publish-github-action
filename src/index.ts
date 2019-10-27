@@ -67,9 +67,6 @@ async function run() {
       filesAndDirectories.map(p => fs.remove(path.join(process.cwd(), p))),
     )
 
-    // Check files.
-    await exec.exec('ls')
-
     // Move back the package.
     await fs.move(tempPackedFilePath, packagedFilePath)
     // Extract it.
@@ -85,10 +82,6 @@ async function run() {
     )
     await fs.remove('package')
 
-    // Check files.
-    await exec.exec('ls')
-
-    return
     await exec.exec(`git add .`)
     await exec.exec(`git commit -a -m "release ${version}"`)
     await exec.exec('git', ['push', 'origin', branchName])
