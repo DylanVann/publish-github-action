@@ -4,12 +4,8 @@ import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as semver from 'semver'
 import * as tar from 'tar'
-
-const Github = require('@actions/github')
-const OctokitPluginRetry = require('@octokit/plugin-retry')
-const createOctokit = require('@octokit/rest')
-
-const Octokit = createOctokit.plugin(OctokitPluginRetry)
+import Github from '@actions/github'
+import Octokit from '@octokit/rest'
 
 const githubToken = core.getInput('github_token', { required: true })
 const context = Github.context
