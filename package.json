@@ -11,7 +11,9 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "ncc build src/index.ts",
+    "build": "yarn run build:ncc && yarn run build:fix",
+    "build:ncc": "ncc build src/index.ts",
+    "build:fix": "ts-node scripts/build.ts",
     "lint": "tsdx lint",
     "start": "ncc build src/index.ts --watch",
     "test": "tsdx test"
@@ -34,6 +36,7 @@
     "fs-extra": "^8.1.0",
     "semver": "^6.3.0",
     "tar": "^5.0.5",
+    "ts-node": "^8.4.1",
     "tsdx": "^0.10.5",
     "tslib": "^1.10.0",
     "typescript": "^3.6.4"
