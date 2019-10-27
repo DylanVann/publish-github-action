@@ -59,10 +59,25 @@ async function run() {
     const tempPackedFilePath = path.join(os.tmpdir(), packagedFilename)
     await fs.move(packagedFilePath, tempPackedFilePath)
     await exec.exec(`git checkout --orphan empty-branch`)
+
+    // Remove all files and folders.
     await exec.exec(`git rm -rf .`)
+    const filesAndDirectories = await fs.readdir(process.cwd())
+    await Promise.all(
+      filesAndDirectories.map(p => fs.remove(path.join(process.cwd(), p))),
+    )
+
+    // Check files.
+    await exec.exec('ls')
+
+    // Move back the package.
     await fs.move(tempPackedFilePath, packagedFilePath)
+    // Extract it.
+    core.info(`Extracting ${packagedFilename}`)
     await tar.extract({ file: packagedFilePath })
     await fs.remove(packagedFilePath)
+
+    // Check files.
     await exec.exec('ls')
 
     return
