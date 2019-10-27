@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as fs from 'fs-extra'
 import * as path from 'path'
+import * as os from 'os'
 import * as semver from 'semver'
 import * as tar from 'tar'
 
@@ -53,9 +54,9 @@ async function run() {
     await exec.exec(`yarn pack`)
 
     // We create a branch containing only the contents of the package.
-    const packagedFilePath = path.join(process.cwd(), `${name}-${version}.tgz`)
-    // Move it to a directory above this so that we can delete everything here.
-    const tempPackedFilePath = path.join(packagedFilePath, '..')
+    const packagedFilename = `${name}-${version}.tgz`
+    const packagedFilePath = path.join(process.cwd(), packagedFilename)
+    const tempPackedFilePath = path.join(os.tmpdir(), packagedFilename)
     await fs.move(packagedFilePath, tempPackedFilePath)
     await exec.exec(`git checkout --orphan empty-branch`)
     await exec.exec(`git rm -rf .`)
