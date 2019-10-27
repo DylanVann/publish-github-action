@@ -1,25 +1,31 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import * as fs from 'fs'
+import * as fs from 'fs-extra'
+import * as path from 'path'
+import * as semver from 'semver'
+import * as tar from 'tar'
+
 const Github = require('@actions/github')
-const Octokit = require('@octokit/rest').plugin(
-  require('@octokit/plugin-retry'),
-)
-const semver = require('semver')
+const OctokitPluginRetry = require('@octokit/plugin-retry')
+const Octokit = require('@octokit/rest')
+
+Octokit.plugin(OctokitPluginRetry)
+
 const githubToken = core.getInput('github_token', { required: true })
 const context = Github.context
 const octokit = new Octokit({ auth: githubToken })
 
 async function run() {
   try {
-    let json = JSON.parse(fs.readFileSync('package.json', 'utf8'))
-    let version = 'v' + json.version
-    let minorVersion =
+    const json = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+    const name = json.name
+    const version = 'v' + json.version
+    const minorVersion =
       'v' + semver.major(json.version) + '.' + semver.minor(json.version)
-    let majorVersion = 'v' + semver.major(json.version)
-    let branchName: string = 'releases/' + version
+    const majorVersion = 'v' + semver.major(json.version)
+    const branchName: string = 'releases/' + version
 
-    let tags = await octokit.repos.listTags({
+    const tags = await octokit.repos.listTags({
       owner: context.repo.owner,
       repo: context.repo.repo,
     })
@@ -29,19 +35,8 @@ async function run() {
       return
     }
 
-    await exec.exec('git', ['checkout', '-b', branchName])
+    await exec.exec(`git checkout -b ${branchName}`)
 
-    const hasYarnLock = fs.existsSync('yarn.lock')
-    const packageManager = hasYarnLock ? 'yarn' : 'npm'
-
-    const hasBuildScript = json.scripts && json.scripts.build
-    if (hasBuildScript) {
-      await exec.exec(`${packageManager} install`)
-      await exec.exec(`${packageManager} run build`)
-      await exec.exec('rm -rf node_modules')
-    }
-
-    await exec.exec(`${packageManager} install --production`)
     await exec.exec(
       'git config --global user.email "github-actions[bot]@users.noreply.github.com"',
     )
@@ -55,11 +50,25 @@ async function run() {
         context.repo.repo +
         '.git',
     )
-    await exec.exec('git add -f node_modules')
-    if (json.files) {
-      await exec.exec(`git add -f ${json.files.join(' ')}`)
-    }
-    await exec.exec('git commit -a -m "prod dependencies"')
+
+    await exec.exec(`yarn install`)
+    await exec.exec(`yarn run build`)
+    await exec.exec(`yarn pack`)
+
+    // We create a branch containing only the contents of the package.
+    const packagedFilePath = path.join(__dirname, `${name}-${version}.tgz`)
+    // Move it to a directory above this so that we can delete everything here.
+    const tempPackedFilePath = path.join(packagedFilePath, '..')
+    await fs.move(packagedFilePath, tempPackedFilePath)
+    await exec.exec(`git checkout --orphan empty-branch`)
+    await exec.exec(`git rm -rf .`)
+    await fs.move(tempPackedFilePath, packagedFilePath)
+    await tar.extract({ file: packagedFilePath })
+    await fs.remove(packagedFilePath)
+    await exec.exec('ls')
+
+    return
+    await exec.exec(`git commit -a -m "release ${version}"`)
     await exec.exec('git', ['push', 'origin', branchName])
 
     await exec.exec('git', ['push', 'origin', ':refs/tags/' + version])
