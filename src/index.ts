@@ -76,11 +76,20 @@ async function run() {
     core.info(`Extracting ${packagedFilename}`)
     await tar.extract({ file: packagedFilePath })
     await fs.remove(packagedFilePath)
+    // Move from "package" into cwd.
+    const filesAndDirectoriesInPackage: string[] = await fs.readdir('package')
+    await Promise.all(
+      filesAndDirectoriesInPackage.map(p =>
+        fs.move(path.join('package', p), p),
+      ),
+    )
+    await fs.remove('package')
 
     // Check files.
     await exec.exec('ls')
 
     return
+    await exec.exec(`git add .`)
     await exec.exec(`git commit -a -m "release ${version}"`)
     await exec.exec('git', ['push', 'origin', branchName])
 
