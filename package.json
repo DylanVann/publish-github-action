@@ -15,7 +15,6 @@
     "build:fix": "ts-node scripts/build.ts",
     "build:ncc": "ncc build src/index.ts",
     "lint": "tsdx lint",
-    "start": "ncc build src/index.ts --watch",
     "test": "tsdx test"
   },
   "prettier": {
@@ -28,18 +27,19 @@
     "@actions/core": "^1.0.0",
     "@actions/exec": "^1.0.1",
     "@actions/github": "^1.1.0",
-    "@octokit/rest": "^16.30.1",
+    "@octokit/rest": "^16.34.1",
     "@types/fs-extra": "^8.0.1",
-    "@types/jest": "^24.0.19",
-    "@types/node": "^12.11.7",
+    "@types/jest": "^24.0.22",
+    "@types/node": "^12.12.6",
+    "@types/semver": "^6.2.0",
     "@types/tar": "^4.0.3",
     "@zeit/ncc": "^0.20.5",
     "fs-extra": "^8.1.0",
     "semver": "^6.3.0",
     "tar": "^5.0.5",
     "ts-node": "^8.4.1",
-    "tsdx": "^0.10.5",
+    "tsdx": "^0.11.0",
     "tslib": "^1.10.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   }
 }

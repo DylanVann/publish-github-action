@@ -1,6 +1,4 @@
-# Publish GitHub Action
-
-![Version](https://img.shields.io/github/v/release/dylanvann/publish-github-action?style=flat-square)
+# Publish GitHub Action · ![Version](https://img.shields.io/github/v/release/dylanvann/publish-github-action)
 
 A GitHub action that helps you publish your GitHub action.
 
