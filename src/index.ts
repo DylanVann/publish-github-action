@@ -15,12 +15,22 @@ const octokit = new Octokit({ auth: githubToken })
 
 async function run() {
   try {
-    const json = JSON.parse(fs.readFileSync('package.json', 'utf8'))
-    const name = json.name
-    const version = 'v' + json.version
+    const rawPackageJson = await fs.readFile('package.json', {
+      encoding: 'utf8',
+    })
+    const packageJson: {
+      name: string
+      version: string
+      files?: string[]
+    } = JSON.parse(rawPackageJson)
+    const name = packageJson.name
+    const version = 'v' + packageJson.version
     const minorVersion =
-      'v' + semver.major(json.version) + '.' + semver.minor(json.version)
-    const majorVersion = 'v' + semver.major(json.version)
+      'v' +
+      semver.major(packageJson.version) +
+      '.' +
+      semver.minor(packageJson.version)
+    const majorVersion = 'v' + semver.major(packageJson.version)
     const branchName: string = 'releases/' + version
 
     const tags = await octokit.repos.listTags({
@@ -50,6 +60,23 @@ async function run() {
 
     await exec.exec(`yarn install`)
     await exec.exec(`yarn run build`)
+    // We manually remove some files that npm always includes (a poor choice on their part IMO).
+    // Files that are not essential to running the package should not be included in the build.
+    const manuallyRemovedFiles = [
+      'CHANGELOG.md',
+      'README.md',
+      'LICENSE',
+      'LICENCE',
+    ]
+    await Promise.all(
+      manuallyRemovedFiles.map(async fileName => {
+        // If the user included the file in their "files" list then they must really want it included.
+        if (packageJson.files && packageJson.files.includes(fileName)) {
+          return
+        }
+        await fs.remove(fileName)
+      }),
+    )
     await exec.exec(`yarn pack`)
 
     // We create a branch containing only the contents of the package.
